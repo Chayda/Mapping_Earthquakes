@@ -27,19 +27,27 @@ let baseMaps = {
   "Satellite Streets": satelliteStreets
 };
 
-
+// Create the earthquake layer for our map.
+let earthquakes = new L.layerGroup();
+// We define an object that contains the overlays.
+// This overlay will be visible all the time.
+let overlays = {
+  Earthquakes: earthquakes
+};
 
 // Create the map object with center at the Earth centre.
 //let map = L.map("mapid").setView([30, 30], 2);
-
 let map = L.map("mapid", {
   center: [39.5, -98.5],
   zoom: 3,
   layers: [streets]
 });
 
+
 // Pass our map layers into our layers control and add the layers control.
-L.control.layers(baseMaps).addTo(map);
+L.control.layers(baseMaps, overlays).addTo(map);
+
+ 
 
 
 // Grabbing our Geo JSON data.
@@ -56,6 +64,16 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       stroke: true,
       weight: 0.5
     };
+  }
+
+ /** This function determines the radius of the earthquake marker based on its magnitude.
+  Earthquakes with a magnitude of 0 will be plotted with a radius of 1.
+  */
+  function getRadius(magnitude) {
+    if (magnitude === 0) {
+      return 1;
+    }
+    return magnitude * 4;
   }
 
   // This function determines the color of the circle based on the magnitude of the earthquake.
@@ -78,15 +96,6 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     return "#98ee00";
   }
 
-  /** This function determines the radius of the earthquake marker based on its magnitude.
-  Earthquakes with a magnitude of 0 will be plotted with a radius of 1.
-  */
-  function getRadius(magnitude) {
-    if (magnitude === 0) {
-      return 1;
-    }
-    return magnitude * 4;
-  }
 
   // Creating a GeoJSON layer with the retrieved data.
   L.geoJson(data, {
@@ -104,5 +113,8 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       onEachFeature: function(feature, layer) {
         layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
       }
-  }).addTo(map)
+  }).addTo(earthquakes);
+
+    //Then we add the earthquake layer to our map.
+    earthquakes.addTo(map);
 });

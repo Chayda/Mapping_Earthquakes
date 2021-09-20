@@ -27,6 +27,8 @@ let baseMaps = {
   "Satellite Streets": satelliteStreets
 };
 
+
+
 // Create the map object with center at the Earth centre.
 //let map = L.map("mapid").setView([30, 30], 2);
 
